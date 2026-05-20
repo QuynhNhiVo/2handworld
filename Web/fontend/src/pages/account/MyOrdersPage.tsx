@@ -45,8 +45,8 @@ export function MyOrdersPage() {
     }
   };
 
-  // Filter orders for current user
-  const userOrders = user ? orders.filter((o) => o.userId === user.id) : guestOrders;
+  // API already limits buyer orders by the logged-in UserID.
+  const userOrders = user ? orders : guestOrders;
   const filteredOrders =
   activeTab === 'all' ?
   userOrders :

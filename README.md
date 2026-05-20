@@ -213,4 +213,19 @@ Web/fontend/src/pages/admin/RevenueReportPage.tsx
 Web/fontend/src/pages/account/MyOrdersPage.tsx
 Web/fontend/package.json
 Web/fontend/package-lock.json
+```
 
+## 10. Note bổ sung sau khi đánh giá lại phân quyền đơn hàng
+
+Các thay đổi bên dưới được xem là lớp quản trị/phân quyền ở database gồm role, quyền truy cập, view và stored procedure để phục vụ yêu cầu môn Quản trị cơ sở dữ liệu.
+
+Đã siết lại phần lịch sử đơn hàng theo góp ý database-level permission:
+
+- Buyer không lấy toàn bộ `vw_OrderPaymentSummary` rồi để frontend tự lọc nữa.
+- API `/orders` của buyer gọi stored procedure `sp_GetBuyerOrderHistory(UserID, Status, OrderID)`.
+- Chi tiết đơn hàng `/orders/{id}` của buyer cũng đi qua procedure này với `UserID` từ session đăng nhập.
+- Frontend `MyOrdersPage` không còn dùng `orders.filter((o) => o.userId === user.id)` làm lớp lọc chính.
+- File quyền database đã bỏ quyền `SELECT` trực tiếp của buyer trên bảng `Order`, `OrderDetail`, `Payment` và bỏ quyền `SELECT` trực tiếp trên `vw_BuyerOrderHistory`.
+- Buyer chỉ được `INSERT` đơn hàng/chi tiết đơn hàng và đọc lịch sử qua procedure đã lọc theo `UserID`.
+
+Lý do: nếu buyer được `SELECT` trực tiếp bảng đơn hàng hoặc view lịch sử không gắn `UserID`, buyer có thể xem dữ liệu của buyer khác khi gọi SQL/API trực tiếp. Cách mới làm rõ cơ chế chặn ở backend + database: backend truyền `UserID` của session vào procedure, còn procedure chỉ trả đơn hàng khớp `UserID` đó.

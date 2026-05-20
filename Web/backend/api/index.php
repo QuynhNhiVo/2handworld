@@ -828,17 +828,22 @@ function order_create(): void
 
 function order_list(): void
 {
+    if (current_user_role() !== 'admin') {
+        $status = !empty($_GET['status']) ? db_order_status((string) $_GET['status']) : null;
+        $stmt = db()->prepare('CALL sp_GetBuyerOrderHistory(?, ?, ?)');
+        $stmt->execute([require_login(), $status, null]);
+        $rows = $stmt->fetchAll();
+        $stmt->closeCursor();
+        json_response(['success' => true, 'data' => array_map('order_row', $rows)]);
+    }
+
     $params = [];
     $where = [];
-    if (current_user_role() !== 'admin') {
-        $where[] = 'UserID = ?';
-        $params[] = require_login();
-    }
+    $sql = 'SELECT * FROM `vw_OrderPaymentSummary`';
     if (!empty($_GET['status'])) {
         $where[] = 'Status = ?';
         $params[] = db_order_status((string) $_GET['status']);
     }
-    $sql = 'SELECT * FROM `vw_OrderPaymentSummary`';
     if ($where !== []) {
         $sql .= ' WHERE ' . implode(' AND ', $where);
     }
@@ -868,9 +873,15 @@ function guest_order_history(): void
 function order_detail(string $id): void
 {
     $orderId = int_id($id, 'o');
-    $stmt = db()->prepare('SELECT * FROM `vw_OrderPaymentSummary` WHERE OrderID = ?');
-    $stmt->execute([$orderId]);
+    if (current_user_role() === 'admin') {
+        $stmt = db()->prepare('SELECT * FROM `vw_OrderPaymentSummary` WHERE OrderID = ?');
+        $stmt->execute([$orderId]);
+    } else {
+        $stmt = db()->prepare('CALL sp_GetBuyerOrderHistory(?, ?, ?)');
+        $stmt->execute([require_login(), null, $orderId]);
+    }
     $order = $stmt->fetch();
+    $stmt->closeCursor();
     if (!$order) {
         error_response('Không tìm thấy đơn hàng.', 404);
     }

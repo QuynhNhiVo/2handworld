@@ -7,6 +7,7 @@ DROP VIEW IF EXISTS `vw_AdminProductCatalog`;
 DROP VIEW IF EXISTS `vw_BuyerProductCatalog`;
 DROP VIEW IF EXISTS `vw_GuestProductCatalog`;
 DROP VIEW IF EXISTS `vw_ProductInventory`;
+DROP PROCEDURE IF EXISTS `sp_GetBuyerOrderHistory`;
 DROP PROCEDURE IF EXISTS `sp_ProcessCancelRequest`;
 DROP PROCEDURE IF EXISTS `sp_UpdateInventory`;
 DROP FUNCTION IF EXISTS `fn_FinalPrice`;
@@ -171,6 +172,40 @@ SELECT
     `UpdatedAt`
 FROM `vw_OrderPaymentSummary`
 WHERE `UserID` IS NOT NULL;
+
+DELIMITER //
+
+CREATE PROCEDURE `sp_GetBuyerOrderHistory`(
+    IN p_UserID INT,
+    IN p_Status VARCHAR(30),
+    IN p_OrderID INT
+)
+SQL SECURITY DEFINER
+BEGIN
+    SELECT
+        `OrderID`,
+        `UserID`,
+        `Username`,
+        `PhoneNumber`,
+        `Address`,
+        `TotalAmount`,
+        `CalculatedTotalAmount`,
+        `Status`,
+        `OrderStatus`,
+        `MethodName`,
+        `PaymentStatus`,
+        `PaymentDate`,
+        `OrderDate`,
+        `CreatedAt`,
+        `UpdatedAt`
+    FROM `vw_BuyerOrderHistory`
+    WHERE `UserID` = p_UserID
+      AND (p_Status IS NULL OR `Status` = p_Status)
+      AND (p_OrderID IS NULL OR `OrderID` = p_OrderID)
+    ORDER BY `CreatedAt` DESC;
+END //
+
+DELIMITER ;
 
 CREATE OR REPLACE VIEW `vw_GuestOrderLookup` AS
 SELECT

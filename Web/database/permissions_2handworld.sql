@@ -19,6 +19,7 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON `2handworld_schema`.* TO `role_2handworl
 GRANT EXECUTE ON FUNCTION `2handworld_schema`.`fn_FinalPrice` TO `role_2handworld_admin`;
 GRANT EXECUTE ON PROCEDURE `2handworld_schema`.`sp_UpdateInventory` TO `role_2handworld_admin`;
 GRANT EXECUTE ON PROCEDURE `2handworld_schema`.`sp_ProcessCancelRequest` TO `role_2handworld_admin`;
+GRANT EXECUTE ON PROCEDURE `2handworld_schema`.`sp_GetBuyerOrderHistory` TO `role_2handworld_admin`;
 GRANT TRIGGER ON `2handworld_schema`.* TO `role_2handworld_admin`;
 
 -- Buyer: xem san pham/kho/phuong thuc thanh toan, tao don, cap nhat ho so,
@@ -28,16 +29,15 @@ GRANT SELECT ON `2handworld_schema`.`PaymentMethod` TO `role_2handworld_buyer`;
 GRANT SELECT ON `2handworld_schema`.`Roles` TO `role_2handworld_buyer`;
 GRANT SELECT ON `2handworld_schema`.`UserRoles` TO `role_2handworld_buyer`;
 GRANT SELECT ON `2handworld_schema`.`vw_BuyerProductCatalog` TO `role_2handworld_buyer`;
-GRANT SELECT ON `2handworld_schema`.`vw_BuyerOrderHistory` TO `role_2handworld_buyer`;
 GRANT SELECT, UPDATE ON `2handworld_schema`.`Users` TO `role_2handworld_buyer`;
 GRANT SELECT, INSERT, UPDATE, DELETE ON `2handworld_schema`.`Cart` TO `role_2handworld_buyer`;
 GRANT SELECT, INSERT, UPDATE, DELETE ON `2handworld_schema`.`CartItems` TO `role_2handworld_buyer`;
-GRANT SELECT, INSERT ON `2handworld_schema`.`Order` TO `role_2handworld_buyer`;
-GRANT SELECT, INSERT ON `2handworld_schema`.`OrderDetail` TO `role_2handworld_buyer`;
-GRANT SELECT ON `2handworld_schema`.`Payment` TO `role_2handworld_buyer`;
+GRANT INSERT ON `2handworld_schema`.`Order` TO `role_2handworld_buyer`;
+GRANT INSERT ON `2handworld_schema`.`OrderDetail` TO `role_2handworld_buyer`;
 GRANT SELECT, INSERT ON `2handworld_schema`.`CancelRequest` TO `role_2handworld_buyer`;
 GRANT SELECT, INSERT, UPDATE, DELETE ON `2handworld_schema`.`Review` TO `role_2handworld_buyer`;
 GRANT EXECUTE ON FUNCTION `2handworld_schema`.`fn_FinalPrice` TO `role_2handworld_buyer`;
+GRANT EXECUTE ON PROCEDURE `2handworld_schema`.`sp_GetBuyerOrderHistory` TO `role_2handworld_buyer`;
 
 -- Guest: chi xem du lieu cong khai, dang ky tai khoan va tao don walk-in.
 GRANT SELECT ON `2handworld_schema`.`Category` TO `role_2handworld_guest`;
